@@ -2,13 +2,11 @@ from config.db_config import engine
 from sqlalchemy import text
 
 def execute_sql_file(filepath):
-    with open(filepath, 'r') as file:
-        sql = file.read()
-
-    with engine.connect() as conn:
-        print(f"Executing {filepath}...")
-        conn.execute(text(sql))
-        print(f"✅ Done: {filepath}")
+        with engine.begin() as conn:
+            with open(filepath, 'r') as file:
+                print(f"Executing {filepath}...")
+                conn.execute(text(file.read()))
+                print(f"✅ Done: {filepath}")
 
 def run_scripts_in_order(manifest_path):
     from utils.manifest_loader import load_manifest

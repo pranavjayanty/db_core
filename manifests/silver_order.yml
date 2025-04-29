@@ -1,0 +1,5 @@
+# - silver/ddl/create_user.sql
+# - silver/transformations/load_user_from_bronze.sql
+# - silver/ddl/create_fact.sql
+- silver/ddl/create_chat.sql
+- silver/transformations/load_dummy_chat.sql

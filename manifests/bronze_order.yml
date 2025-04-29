@@ -1,2 +1,2 @@
-- bronze/ddl/create_people_raw.sql
-# - bronze/staging/load_raw_data.sql
+# - bronze/ddl/create_user_raw.sql
+- bronze/ddl/create_chat_raw.sql
