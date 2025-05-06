@@ -12,10 +12,12 @@ class DiscordExtractor:
     
     This class provides methods to:
     - Export all messages from channels and their threads directly to CSV
+    - Export channel information to CSV
     - Run the complete ETL pipeline
     
     The data is exported in a single format:
     - CSV file containing all messages with channel and thread information
+    - CSV file containing channel information
     """
     
     def __init__(self):
@@ -55,6 +57,56 @@ class DiscordExtractor:
             A new Discord client instance with the required permissions.
         """
         return discord.Client(intents=self.intents)
+
+    async def export_channels(self) -> None:
+        """
+        Export channel information from Discord server to CSV.
+        
+        This method:
+        1. Connects to Discord using the bot token
+        2. Gets the guild (server) structure directly from Discord
+        3. Extracts channel information (name and ID)
+        4. Saves channel data to a CSV file
+        
+        The output CSV contains:
+        - Channel name
+        - Channel ID
+        """
+        client = self.create_client()
+
+        @client.event
+        async def on_ready():
+            guild = client.get_guild(self.guild_id)
+            if guild is None:
+                print(f"❌ Guild ID {self.guild_id} not found.")
+                await client.close()
+                return
+
+            channels = []
+            
+            # Process all text channels in the guild
+            for channel in guild.text_channels:
+                channels.append({
+                    "channel_name": channel.name,
+                    "channel_id": channel.id
+                })
+                print(f"✅ Extracted channel: {channel.name}")
+
+            # Write channels to CSV
+            csv_path = os.path.join("csv_files", "channels.csv")
+            try:
+                with open(csv_path, "w", encoding="utf-8", newline='') as f:
+                    writer = csv.DictWriter(f, fieldnames=["channel_name", "channel_id"])
+                    writer.writeheader()
+                    writer.writerows(channels)
+                
+                print(f"✅ Wrote {csv_path} ({len(channels)} channels)")
+            except Exception as e:
+                print(f"❌ Error writing CSV file: {str(e)}")
+
+            await client.close()
+
+        await client.start(self.token)
 
     async def export_chat_history(self) -> None:
         """

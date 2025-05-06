@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS silver.channel (
+    channel_id SERIAL PRIMARY KEY,
+    channel_name TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+); 
