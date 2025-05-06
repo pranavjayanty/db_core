@@ -101,29 +101,35 @@ class DiscordExtractor:
                     # Export messages from the main channel
                     async for msg in channel.history(limit=None):
                         channel_messages.append({
-                            "channel_id": channel.id,
                             "channel_name": channel.name,
-                            "thread_id": None,
+                            "channel_id": channel.id,
                             "thread_name": None,
+                            "thread_id": None,
                             "message_id": msg.id,
                             "author": msg.author.name,
-                            "content": msg.content,
-                            "timestamp": msg.created_at.isoformat()
+                            "chat_text": msg.content,
+                            "created_at": msg.created_at.isoformat()
                         })
                     
                     # Export messages from threads
-                    for thread in channel.threads:
+                    # Get both active and archived threads
+                    active_threads = channel.threads
+                    archived_threads = []
+                    async for thread in channel.archived_threads():
+                        archived_threads.append(thread)
+                    threads = active_threads + archived_threads
+                    for thread in threads:
                         print(f"  🔄 Exporting thread: {thread.name}")
                         async for msg in thread.history(limit=None):
                             channel_messages.append({
-                                "channel_id": channel.id,
                                 "channel_name": channel.name,
-                                "thread_id": thread.id,
+                                "channel_id": channel.id,
                                 "thread_name": thread.name,
+                                "thread_id": thread.id,
                                 "message_id": msg.id,
                                 "author": msg.author.name,
-                                "content": msg.content,
-                                "timestamp": msg.created_at.isoformat()
+                                "chat_text": msg.content,
+                                "created_at": msg.created_at.isoformat()
                             })
                     
                     all_messages.extend(channel_messages)
@@ -139,8 +145,8 @@ class DiscordExtractor:
             try:
                 with open(csv_path, "w", encoding="utf-8", newline='') as f:
                     writer = csv.DictWriter(f, fieldnames=[
-                        "channel_id", "channel_name", "thread_id", "thread_name",
-                        "message_id", "author", "content", "timestamp"
+                        "channel_name", "channel_id", "thread_name","thread_id",
+                        "message_id", "author", "chat_text", "created_at"
                     ])
                     writer.writeheader()
                     writer.writerows(all_messages)
