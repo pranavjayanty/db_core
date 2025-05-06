@@ -5,3 +5,7 @@ CREATE TABLE IF NOT EXISTS bronze.chat_raw (
     chat_text TEXT,
     ingestion_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+
+
